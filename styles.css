@@ -64,8 +64,8 @@ input[type="number"] {
 
 /* Download button */
 #downloadButton {
-  display: none;
-  margin-top: 15px;
+  display: block;
+  margin: 15px auto 0;  /* Centers the button horizontally */
   padding: 10px 15px;
   background-color: #bb86fc;
   color: #121212;
@@ -77,7 +77,6 @@ input[type="number"] {
   font-size: 1rem;
   transition: background-color 0.3s ease;
 }
-
 #downloadButton:hover {
   background-color: #7b61ff;
 }

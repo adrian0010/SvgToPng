@@ -10,6 +10,7 @@ const canvas = document.getElementById("canvas");
 let originalWidth = 0;
 let originalHeight = 0;
 let originalFileName = ""; // To store the original SVG file name
+let pngDataUrl = ""; // To store the PNG data URL for download
 
 // Show resolution display, scale input, and download button when SVG is uploaded
 svgInput.addEventListener("change", function () {
@@ -63,8 +64,8 @@ function updateScaledResolution(originalWidth, originalHeight, scale) {
   scaledResolutionDisplay.textContent = `${scaledWidth.toFixed(0)} x ${scaledHeight.toFixed(0)}`;
 }
 
-// Perform the conversion and download PNG when the download button is clicked
-downloadButton.addEventListener("click", function () {
+// Prepare PNG data on hover over download button
+downloadButton.addEventListener("mouseover", function () {
   const scale = parseFloat(scaleInput.value);
   const scaledWidth = originalWidth * scale;
   const scaledHeight = originalHeight * scale;
@@ -84,23 +85,30 @@ downloadButton.addEventListener("click", function () {
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(image, 0, 0, scaledWidth, scaledHeight);
 
-      // Generate the download file name
-      let downloadFileName = originalFileName;
-      if (scale !== 1) {
-        downloadFileName += `-scaled-${scale.toFixed(2)}`; // Append the scale factor if not 1
-      }
-      downloadFileName += ".png"; // Ensure it has the .png extension
-
-      // Convert canvas to PNG and trigger download
-      const pngData = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pngData;
-      downloadLink.download = downloadFileName;
-      downloadLink.click();
+      // Convert canvas to PNG and store data URL
+      pngDataUrl = canvas.toDataURL("image/png");
     };
 
     image.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
   reader.readAsText(svgInput.files[0]);
+});
+
+// Trigger download when download button is clicked
+downloadButton.addEventListener("click", function () {
+  if (!pngDataUrl) return; // Check if PNG data is ready
+
+  const scale = parseFloat(scaleInput.value);
+  let downloadFileName = originalFileName;
+  if (scale !== 1) {
+    downloadFileName += `-scaled-${scale.toFixed(2)}`; // Append the scale factor if not 1
+  }
+  downloadFileName += ".png"; // Ensure it has the .png extension
+
+  // Create a temporary link to download the PNG file
+  const downloadLink = document.createElement("a");
+  downloadLink.href = pngDataUrl;
+  downloadLink.download = downloadFileName;
+  downloadLink.click(); // Trigger the download
 });
